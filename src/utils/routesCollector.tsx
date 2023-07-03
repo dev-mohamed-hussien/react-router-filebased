@@ -28,6 +28,7 @@ type NestedRoute = {
 }
 
 function getRoutes(r: any): RouteConfig[] {
+  // console.log(r.keys(), 'routes')
   return r.keys().map((route: string) => {
     const path = route
       .substr(1)
@@ -36,7 +37,6 @@ function getRoutes(r: any): RouteConfig[] {
       .replace(/\[(.+)\]/, ':$1')
     console.log({ React })
     const Element = React.lazy(() => r(route))
-    debugger
 
     return {
       path,
@@ -47,7 +47,7 @@ function getRoutes(r: any): RouteConfig[] {
 
 function getMetaData(key: string, routes: RouteConfig[]): LayoutMetaData | NotFoundMetaData {
   const data: LayoutMetaData | NotFoundMetaData = {}
-  debugger
+  // debugger
 
   routes
     .filter((route) => route.path.includes(key))
@@ -143,17 +143,12 @@ function nestedRoutes(routes: RouteConfig[]): NestedRoute[] {
   })
   return nested
 }
-let requireAll
-try {
-  requireAll = (require as any).context?.(
-    './../../../../../src/pages',
-    true,
-    /^\.\/(?!pages\/)[\w\/\[\]\-_]+\.(tsx|jsx)?$/,
-    'lazy',
-  )
-} catch (error) {
-  throw new Error('Error: Unable to find src/pages directory.')
-}
+const requireAll = (require as any).context(
+  './../../../../../src/pages',
+  true,
+  /^\.\/(?!pages\/)[\w\/\[\]\-_]+\.(tsx|jsx)?$/,
+  'lazy',
+)
 
 const paths = getRoutes(requireAll)
 const collectedRoutes = nestedRoutes(paths) as RouteObject[]
