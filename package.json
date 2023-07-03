@@ -15,7 +15,7 @@
     "lint": "eslint \"{**/*,*}.{js,ts,jsx,tsx}\"",
     "pret": "prettier --write \"{src,tests,example/src}/**/*.{js,ts,jsx,tsx}\"",
     "prepare": "npm run build:esm",
-    "prepublishOnly": "npm run prettier && npm run lint"
+    "prepublishOnly": "npm run pret && npm run lint"
   },
   "author": {
     "name": "mohamed adel",
