@@ -1,6 +1,6 @@
 {
   "name": "react-router-filebased",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
@@ -76,8 +76,5 @@
     "performance optimization",
     "declarative routing",
     "configuration-based routing"
-  ],
-  "dependencies": {
-    "react-router-dom": ">=6.11.2"
-  }
+  ]
 }
