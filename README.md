@@ -10,7 +10,7 @@ With React-Router-Filebased, you can create routes directly from your file struc
 
 ```bash
 cd project-name
-npm install --save react-router-filebased
+npm i react-router-filebased react-router-dom
 mkdir src/pages
 ```
 

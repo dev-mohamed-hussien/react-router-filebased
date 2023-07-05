@@ -1,6 +1,6 @@
 {
   "name": "react-router-filebased",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
@@ -41,11 +41,9 @@
     "prettier": "^2.8.8",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
+    "react-router-dom": "^6.11.2",
     "ts-jest": "^29.1.1",
     "typescript": "^4.7.3"
-  },
-  "dependencies": {
-    "react-router-dom": ">=6.11.2"
   },
   "peerDependencies": {
     "react": ">=16",
@@ -78,5 +76,8 @@
     "performance optimization",
     "declarative routing",
     "configuration-based routing"
-  ]
+  ],
+  "dependencies": {
+    "react-router-dom": ">=6.11.2"
+  }
 }
