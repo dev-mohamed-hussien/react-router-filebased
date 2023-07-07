@@ -1,5 +1,6 @@
 import React, { JSXElementConstructor, ReactElement, ReactNode, cloneElement } from 'react'
 import { Outlet, RouteObject } from 'react-router-dom'
+
 type RouteConfig = {
   path: string
   element: ReactElement<any, string | JSXElementConstructor<any>>
