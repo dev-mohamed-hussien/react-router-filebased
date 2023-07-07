@@ -1,3 +1,4 @@
 import FileBasedProvider from './components/Provider/index'
+import { routes } from './components/Provider/index'
 
-export { FileBasedProvider }
+export { FileBasedProvider, routes }
