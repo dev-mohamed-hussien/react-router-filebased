@@ -1,19 +1,10 @@
 import React, { JSXElementConstructor, ReactElement, ReactNode, cloneElement } from 'react'
 import { Outlet, RouteObject } from 'react-router-dom'
-
 type RouteConfig = {
   path: string
   element: ReactElement<any, string | JSXElementConstructor<any>>
 }
-
-type LayoutRoutes = {
-  [key: string]: { el: ReactNode; pathLength: number }
-}
-
-type NotFoundRoutes = {
-  [key: string]: { el: ReactNode; pathLength: number }
-}
-type ErrorRoutes = {
+type MetaRoutes = {
   [key: string]: { el: ReactNode; pathLength: number }
 }
 const getRoutes = (r: any): RouteConfig[] => {
@@ -29,7 +20,7 @@ const getRoutes = (r: any): RouteConfig[] => {
     return { path, element: <Element /> }
   })
 }
-const getLoadingRoutes = (r: any): RouteConfig[] => {
+const getSyncRoutes = (r: any): RouteConfig[] => {
   return r.keys().map((route: string) => {
     const path = route.substr(1).replace(/\/src\/pages|index|\.(js|jsx|ts|tsx)$/g, '')
 
@@ -37,10 +28,8 @@ const getLoadingRoutes = (r: any): RouteConfig[] => {
     return { path, element: <Element /> }
   })
 }
-
-function getMetaData(key: string, routes: RouteConfig[]): LayoutRoutes | NotFoundRoutes {
-  const data: LayoutRoutes | NotFoundRoutes = {}
-
+function getMetaData(key: string, routes: RouteConfig[]): MetaRoutes {
+  const data: MetaRoutes = {}
   routes
     .filter((route) => route.path.includes(key))
     .forEach((route) => {
@@ -56,47 +45,35 @@ function getMetaData(key: string, routes: RouteConfig[]): LayoutRoutes | NotFoun
 
   return data
 }
-
 function nestedRoutes(
   mainRoutes: RouteConfig[],
-  layoutRoutes: LayoutRoutes,
-  errorRoutes: ErrorRoutes,
-  loadingMetatRoutes: LayoutRoutes,
+  layoutMetaRoutes: MetaRoutes,
+  errorMetaRoutes: MetaRoutes,
+  loadingMetatRoutes: MetaRoutes,
 ): RouteObject[] {
   const nested: RouteObject[] | null = []
   mainRoutes.forEach((route) => {
     let currentNode = nested
     const splittedPath = route.path.split('/')
     splittedPath.forEach((part, i) => {
-      // let Loading = Object.values(loadingMetatRoutes).find(
-      //   (e) => e.pathLength === splittedPath.length
-      // )?.el;
-      // let pathLength = splittedPath.length;
-      // while (!Loading && pathLength > 0) {
-      //   pathLength--;
-      //   Loading = Object.values(loadingMetatRoutes).find(
-      //     (e) => e.pathLength === pathLength
-      //   )?.el;
-      // }
-      const Loading = Object.values(loadingMetatRoutes)
+      const isChild = i === splittedPath.length - 1
+      const loadingMetatRoutesArray = Object.values(loadingMetatRoutes)
+      const Loading = loadingMetatRoutesArray
         .sort((a, b) => b.pathLength - a.pathLength)
         .find((e) => e.pathLength <= splittedPath.length)?.el
-
-      const isLastCild = i === splittedPath.length - 1
-
       let childNode = currentNode?.find((node) => node.path === part)
       if (!childNode) {
         childNode = {
           path: part === '404' ? '*' : part,
-          element: isLastCild ? (
+          element: isChild ? (
             <React.Suspense fallback={Loading}>{route.element}</React.Suspense>
-          ) : layoutRoutes[part] ? (
-            <React.Suspense fallback={Loading}>{layoutRoutes[part].el}</React.Suspense>
+          ) : layoutMetaRoutes[part] ? (
+            layoutMetaRoutes[part].el
           ) : (
             ''
           ),
-          children: isLastCild ? undefined : [],
-          errorElement: Object.values(errorRoutes).find((e) => e.pathLength === splittedPath.length)?.el,
+          children: isChild ? undefined : [],
+          errorElement: Object.values(errorMetaRoutes).find((e) => e.pathLength === splittedPath.length)?.el,
         }
 
         if (i === 0) {
@@ -112,29 +89,32 @@ function nestedRoutes(
   })
   return nested
 }
-const loadingAll = (require as any).context(
-  './../../../../../src/pages',
-  true,
-  /^\.\/(?!pages\/).*loading.*\.(js|jsx|ts|tsx)$/,
-)
-const loadingRoutes = getLoadingRoutes(loadingAll)
-const loadingMetatRoutes = getMetaData('loading', loadingRoutes)
 
 export default function collectedRoutes(): RouteObject[] {
   const requireAll = (require as any).context(
     './../../../../../src/pages',
     true,
-    /^\.\/(?!pages\/)[\w\/\[\]\-_]+\.(tsx|jsx)?$/,
+    /^\.\/(?!pages\/)(?!.*(?:loading|layout|500))[\w\/\[\]\-_]+\.(tsx|jsx)?$/,
     'lazy',
   )
 
-  const routes = getRoutes(requireAll)
-
-  const layoutRoutes = getMetaData('layout', routes)
-  const errorRoutes = getMetaData('500', routes)
-  const mainRoutes = routes.filter(
-    (route: RouteConfig): boolean => !route.path.includes('layout') && !route.path.includes('500'),
+  const loadingAll = (require as any).context(
+    './../../../../../src/pages',
+    true,
+    /^\.\/(?!pages\/).*loading.*\.(js|jsx|ts|tsx)$/,
   )
+  const layoutAll = (require as any).context(
+    './../../../../../src/pages',
+    true,
+    /^\.\/(?!pages\/).*layout.*\.(js|jsx|ts|tsx)$/,
+  )
+  const routes = getRoutes(requireAll)
+  const loadingRoutes = getSyncRoutes(loadingAll)
+  const layoutRoutes = getSyncRoutes(layoutAll)
 
-  return nestedRoutes(mainRoutes, layoutRoutes, errorRoutes, loadingMetatRoutes)
+  const loadingMetatRoutes = getMetaData('loading', loadingRoutes)
+  const layoutMetaRoutes = getMetaData('layout', layoutRoutes)
+  const errorMetaRoutes = getMetaData('500', routes)
+
+  return nestedRoutes(routes, layoutMetaRoutes, errorMetaRoutes, loadingMetatRoutes)
 }
