@@ -19,7 +19,7 @@ mkdir src/pages
 ```tsx
 // src/App.tsx
 import React from 'react'
-import FileBasedProvider from 'react-router-filebased'
+import { FileBasedProvider } from 'react-router-filebased'
 
 function App() {
   return <FileBasedProvider />
@@ -60,6 +60,37 @@ function RootLayout({ children }: Props) {
   return <div>{children}</div>
 }
 export default RootLayout
+```
+
+```tsx
+// src/pages/loading.tsx
+// lazy loading fallback
+import React from 'react'
+
+function Loading() {
+  return <h1>Loading...</h1>
+}
+export default Loading
+```
+
+```tsx
+// src/pages/500.tsx
+import React from 'react'
+
+function Error() {
+  return <h1>Error Page</h1>
+}
+export default Error
+```
+
+```tsx
+// src/pages/404.tsx
+import React from 'react'
+
+function NotFound() {
+  return <h1>NotFound Page</h1>
+}
+export default NotFound
 ```
 
 ## License
