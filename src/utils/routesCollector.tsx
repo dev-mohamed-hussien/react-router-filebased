@@ -94,7 +94,7 @@ export default function collectedRoutes(): RouteObject[] {
   const requireAll = (require as any).context(
     './../../../../../src/pages',
     true,
-    /^\.\/(?!pages\/)(?!.*(?:loading|layout|500))[\w\/\[\]\-_]+\.(tsx|jsx)?$/,
+    /^\.\/(?!pages\/)(?!.*(?:loading|layout))[\w\/\[\]\-_]+\.(tsx|jsx|js|ts)?$/,
     'lazy',
   )
 
